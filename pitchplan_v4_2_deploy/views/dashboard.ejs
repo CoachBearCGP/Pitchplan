@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PitchPlan v4 – Dashboard</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="left">
+      <h1>PitchPlan v4</h1>
+      <span class="muted">Welcome, <%= user.name %></span>
+    </div>
+    <div class="right">
+      <% if (user.is_admin) { %><a class="btn" href="/admin">Admin</a><% } %>
+      <form method="POST" action="/logout" style="display:inline"><button class="btn outline" type="submit">Logout</button></form>
+    </div>
+  </header>
+
+  <main class="container">
+    <% if (!assignment) { %>
+      <div class="card"><h2>No program assigned yet</h2><p class="muted">Ask your coach/admin to assign you a plan.</p></div>
+    <% } else if (!weekNumber || weekDays.length === 0) { %>
+      <div class="card"><h2>Your plan isn't generated yet</h2><p class="muted">Please ask your coach/admin to click "Generate 6-Week".</p></div>
+    <% } else { %>
+      <div class="card">
+        <div class="title-row">
+          <h2>Week <%= weekNumber %> – <%= assignment.start_date %> start</h2>
+          <span class="badge"><%= assignment.program_name %></span>
+        </div>
+        <div class="grid week">
+          <% weekDays.forEach(d => { %>
+            <div class="day">
+              <div class="day-hd"><%= d.label %> <span class="muted"><%= d.date %></span></div>
+              <div class="section">
+                <div class="section-hd">Workout</div>
+                <label class="chk"><input type="checkbox" data-date="<%= d.date %>" data-section="workout" <%= d.complete.workout ? 'checked' : '' %> > Completed</label>
+                <div class="text"><%= d.entry.workout || '—' %></div>
+              </div>
+              <div class="section">
+                <div class="section-hd">Mobility/Stretch</div>
+                <label class="chk"><input type="checkbox" data-date="<%= d.date %>" data-section="mobility" <%= d.complete.mobility ? 'checked' : '' %> > Completed</label>
+                <div class="text"><%= d.entry.mobility || '—' %></div>
+              </div>
+              <div class="section">
+                <div class="section-hd">Throwing</div>
+                <label class="chk"><input type="checkbox" data-date="<%= d.date %>" data-section="throwing" <%= d.complete.throwing ? 'checked' : '' %> > Completed</label>
+                <div class="text"><%= d.entry.throwing || '—' %></div>
+              </div>
+              <div class="section">
+                <div class="section-hd">Notes</div>
+                <textarea class="note" data-date="<%= d.date %>" placeholder="e.g., arm felt tight today"><%= d.note || '' %></textarea>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+  </main>
+
+  <script src="/chart.js"></script>
+  <script>
+    async function post(url, data){
+      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+      return res.json();
+    }
+    document.addEventListener('change', (e)=>{
+      const cb = e.target.closest('input[type="checkbox"][data-section]');
+      if (!cb) return;
+      post('/api/complete', { date: cb.dataset.date, section: cb.dataset.section, value: cb.checked });
+    });
+    let saveTimer;
+    document.addEventListener('input', (e)=>{
+      const ta = e.target.closest('textarea.note');
+      if (!ta) return;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(()=> post('/api/note', { date: ta.dataset.date, note: ta.value }), 400);
+    });
+  </script>
+</body>
+</html>

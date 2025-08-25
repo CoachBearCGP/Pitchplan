@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PitchPlan v4 – Login</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="auth">
+  <div class="card auth-card">
+    <h1>PitchPlan v4</h1>
+    <p class="muted">Weekly programs for pitchers</p>
+    <% if (error) { %><div class="alert"><%= error %></div><% } %>
+    <form method="POST" action="/login">
+      <label>Email <input type="email" name="email" required></label>
+      <label>Password <input type="password" name="password" required></label>
+      <button type="submit">Sign in</button>
+    </form>
+  </div>
+</body>
+</html>

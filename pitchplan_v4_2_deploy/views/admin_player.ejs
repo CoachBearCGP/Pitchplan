@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Detail – <%= user.name %></title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="left"><h1>Player: <%= user.name %></h1></div>
+    <div class="right">
+      <a class="btn" href="/admin/reports">Back to Reports</a>
+      <a class="btn" href="/admin/player/<%= user.id %>/print" target="_blank">Printable Report</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid two">
+      <div class="card">
+        <h2>Overview</h2>
+        <p class="muted"><%= user.email %></p>
+        <% if (assignment) { %>
+          <p>Start date: <%= start_date %></p>
+          <p>Current week: <%= currentWeek %></p>
+        <% } else { %>
+          <p>No assignment yet.</p>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h2>Current Week</h2>
+        <% if (assignment) { %>
+        <table class="table">
+          <thead><tr><th>Day</th><th>Date</th><th>Workout</th><th>Mobility</th><th>Throwing</th></tr></thead>
+          <tbody>
+            <% weekDates.forEach((d, idx) => { %>
+              <tr>
+                <td><%= ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][idx] %></td>
+                <td><%= d %></td>
+                <td>
+                  <% let cw = 0; %>
+                  <% /* further detail could be added from plan_weeks if desired */ %>
+                  —
+                </td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% } else { %>
+          <p>No plan yet.</p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Last 28 Days – Daily Completion (0–3)</h2>
+      <canvas id="dailyChart" width="1000" height="300"></canvas>
+      <script src="/chart.js"></script>
+      <script>
+        const series = <%- daily %>;
+        drawBarChart(document.getElementById('dailyChart'), series.map(p=>p.date), series.map(p=>p.value), {
+          yMax: 3,
+          xLabelEvery: 4,
+          title: 'Completions per Day (0–3)'
+        });
+      </script>
+    </div>
+
+    <div class="card">
+      <h2>Recent Notes</h2>
+      <% if (notes.length === 0) { %>
+        <p class="muted">No notes yet.</p>
+      <% } else { %>
+        <table class="table">
+          <thead><tr><th>Date</th><th>Note</th></tr></thead>
+          <tbody>
+            <% notes.forEach(n => { %>
+              <tr><td><%= n.date %></td><td><%= n.note %></td></tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </main>
+</body>
+</html>

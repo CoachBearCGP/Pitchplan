@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PitchPlan v4 – Reports</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="left"><h1>Coach Reports</h1></div>
+    <div class="right">
+      <a class="btn" href="/admin">Back to Admin</a>
+      <a class="btn" href="/admin/export/completions.csv">Export Completions CSV</a>
+      <a class="btn" href="/admin/export/notes.csv">Export Notes CSV</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h2>Weekly Completion</h2>
+      <table class="table">
+        <thead><tr><th>Player</th><th>Email</th><th>Current Week</th><th>Completed</th><th>Total</th><th>%</th><th>Detail</th></tr></thead>
+        <tbody>
+          <% reports.forEach(r => { %>
+            <tr>
+              <td><%= r.user_name %></td>
+              <td><%= r.email %></td>
+              <td><%= r.current_week %></td>
+              <td><%= r.done %></td>
+              <td><%= r.total %></td>
+              <td><%= r.completion_pct %>%</td>
+              <td><a class="btn small" href="/admin/player/<%= r.user_id %>">Open</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Recent Notes</h2>
+      <table class="table">
+        <thead><tr><th>Date</th><th>Player</th><th>Email</th><th>Note</th><th>Detail</th></tr></thead>
+        <tbody>
+          <% recentNotes.forEach(n => { %>
+            <tr>
+              <td><%= n.date %></td>
+              <td><%= n.user_name %></td>
+              <td><%= n.email %></td>
+              <td><%= n.note %></td>
+              <td><a class="btn small" href="/admin/player/<%= n.user_id %>">Open</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>
